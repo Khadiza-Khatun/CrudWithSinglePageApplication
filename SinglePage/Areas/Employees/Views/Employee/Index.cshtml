@@ -1,0 +1,101 @@
+﻿@model SinglePage.Areas.Employees.Models.VmEmployee
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<h4>Add Employee</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Index" enctype="multipart/form-data" asp-area="Employees" asp-controller="Employee" method="post">
+            <div class="form-group">
+                <input asp-for="Id" id="id" type="hidden" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="employeeCode" class="control-label"></label>
+                <input asp-for="employeeCode" id="code" class="form-control" onchange="CheckEmpCode()" />
+            </div>
+            <div class="form-group">
+                <label asp-for="employeeName" class="control-label"></label>
+                <input asp-for="employeeName" id="empName" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Email" class="control-label"></label>
+                <input asp-for="Email" id="email" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="DateOfBirth" class="control-label"></label>
+                <input asp-for="DateOfBirth" type="date" id="dob" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label asp-for="Image" class="control-label"></label>
+                <input asp-for="Image" type="file" id="image" class="form-control" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<div class="card">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Employee Code</th>
+                <th>Employee Name</th>
+                <th>Email</th>
+                <th>Date Of Birth</th>
+                <th>Image</th>
+                <th colspan="2">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var e in Model.employees)
+            {
+                <tr>
+                    <td>@e.employeeCode</td>
+                    <td>@e.employeeName</td>
+                    <td>@e.Email</td>
+                    <td>@e.DateOfBirth</td>
+                    <td><img src="/Picture/@e.Image" height="100" width="100" /></td>
+                    <td><a class="btn btn-primary" onclick="Edit(@e.Id, '@e.employeeCode', '@e.employeeName', '@e.Email', '@e.DateOfBirth', '@e.Image')" href="#">Edit</a></td>
+                    <td><a class="btn btn-danger" onclick="Remove(@e.Id)" href="#">Delete</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<script type="text/javascript">
+    function Edit(Id, employeeCode, employeeName, Email, DateOfBirth, Image) {
+        $("#id").val(Id);
+        $("#empCode").val(employeeCode);
+        $("#empName").val(employeeName);
+        $("#email").val(Email);
+        $("#dob").val(DateOfBirth);
+        $("#image").val(Image);
+    };
+
+    function Remove(Id) {
+        location.replace("/Employees/Employee/Delete/" + Id);
+    };
+
+    function CheckEmpCode() {
+        var Code = document.getElementById('code').value;
+        console.log(Code);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/Employees/Employee/checkcode?code=' + Code);
+        xhr.onload = function () {
+            var c = JSON.parse(this.responseText);
+            if (c == "duplicate") {
+                alert('this Employee code is already exit!')
+                document.getElementById('code').value = '';
+                return false;
+            }
+        }
+        xhr.send();
+    }
+
+</script>
